@@ -1,1 +1,9 @@
-node_modules/
+.env
+/node_modules/*
+.idea/*
+/backup/*
+*.log
+build/
+tmp/
+temp/
+coverage/*
