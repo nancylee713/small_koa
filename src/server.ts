@@ -3,6 +3,7 @@ import bodyParser from "koa-bodyparser";
 import cors from "koa2-cors";
 import logger from "koa-logger";
 import healthcheckRoutes from "./routes/healthcheck";
+import bookRoutes from "./routes/books";
 import { config } from "./config";
 
 const app = new Koa();
@@ -16,7 +17,8 @@ app.use(
   })
 );
 app.use(logger());
-app.use(healthcheckRoutes.routes())
+app.use(healthcheckRoutes.routes());
+app.use(bookRoutes.routes());
 
 const server = app
   .listen(PORT, async () => {
