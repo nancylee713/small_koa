@@ -7,6 +7,25 @@ import * as storage from "../storage/redis";
 
 const router = new Router();
 
+router.get(`/books`, async (ctx: Context) => {
+  try {
+    const store = storage.redisStorage();
+    const list_name = "my_book_list";
+
+    const my_list = await store.get(list_name)
+
+    ctx.status = 200;
+    ctx.body = {
+      books: await store.get(list_name)
+    }
+
+    return ctx;
+
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 router.post(`/books`, async (ctx: Context) => { 
   try {
 
