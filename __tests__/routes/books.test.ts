@@ -18,7 +18,7 @@ describe("routes/books", () => {
     it(`should allow adding books to the list - ${book}`, async () => {
       const response = await request(server)
         .post("/books")
-        .send({ book: book });
+        .send({ title: book });
       
       expect(response.status).toEqual(201);
       expect(response.type).toEqual("application/json");
@@ -29,4 +29,32 @@ describe("routes/books", () => {
       });
     });
   });
+
+
+  it('should return a validation failure if the book data is incorrect', async () => {
+    const response = await request(server)
+      .post("/books")
+      .send({ title: ""});
+    
+    expect(response.status).toEqual(400);
+    expect(response.type).toEqual("application/json");
+    expect(response.body).toEqual(
+      {
+        "status": "error",
+        "data": [
+          {
+            "target": {
+                "title": ""
+            },
+            "value": "",
+            "property": "title",
+            "children": [],
+            "constraints": {
+                "length": "title must be longer than or equal to 1 characters"
+            }
+          }
+        ]
+      }
+    );
+
 });
