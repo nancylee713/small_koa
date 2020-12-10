@@ -7,3 +7,4 @@ build/
 tmp/
 temp/
 coverage/*
+dump.rdb

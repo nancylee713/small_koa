@@ -1,6 +1,8 @@
-import supertest from "supertest";
 import server from "../../src/server";
 import request from "supertest";
+import * as storage from "../../src/storage/redis";
+
+jest.mock("../../src/storage/redis");
 
 afterEach((done) => {
   server.close();
@@ -11,11 +13,22 @@ describe("routes/books", () => {
 
   const books = [
     "아몬드",
-    "모모",
+    // "모모",
   ]
 
   books.forEach((book: string) => {
-    it(`should allow adding books to the list - ${book}`, async () => {
+    it.only(`should allow adding books to the list - ${book}`, async () => {
+
+      const mockGet = jest.fn((list: string) => Promise.resolve([book]));
+
+      storage.redisStorage = jest.fn(() => {
+        return {
+          get: mockGet,
+          add: (list: string) => Promise.resolve(false),
+          remove: (list: string) => Promise.resolve(false),
+        }
+      });
+
       const response = await request(server)
         .post("/books")
         .send({ title: book });
@@ -27,11 +40,13 @@ describe("routes/books", () => {
           book,
         ]
       });
+
+      expect(mockGet).toHaveBeenCalled();
     });
   });
 
 
-  it('should return a validation failure if the book data is incorrect', async () => {
+  xit('should return a validation failure if the book data is incorrect', async () => {
     const response = await request(server)
       .post("/books")
       .send({ title: ""});
@@ -56,5 +71,5 @@ describe("routes/books", () => {
         ]
       }
     );
-
+  });
 });

@@ -7,7 +7,7 @@ export interface IConfig {
 }
 
 export interface IStorage {
-  get: (list_name: string) => Promise<string[]>;
-  add: (list_name: string, item: string) => Promise<boolean>;
-  remove: (list_name: string, item: string) => Promise<boolean>;
+  get: (list: string) => Promise<string[]>;
+  add: (list: string, item: string) => Promise<boolean>;
+  remove: (list: string, item: string) => Promise<boolean>;
 }

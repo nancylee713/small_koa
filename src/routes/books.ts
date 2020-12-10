@@ -2,6 +2,7 @@ import { validate } from "class-validator";
 import {Context} from "koa";
 import Router from "koa-router";
 import { AddBookRequest } from "../request/AddBookRequest";
+import * as storage from "../storage/redis";
 
 const router = new Router();
 
@@ -30,11 +31,12 @@ router.post(`/books`, async (ctx: Context) => {
       return ctx;
     }
 
+    // test mock storage
+    console.log('route storage', storage);
+    
     ctx.status = 201;
     ctx.body = {
-      books: [
-        ctx.request.body.title,
-      ]
+      books: await storage.redisStorage().get('my_test_list')
     }
   } catch (e) {
     console.error(e);
