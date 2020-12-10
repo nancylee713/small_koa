@@ -2,6 +2,7 @@ import { validate } from "class-validator";
 import {Context} from "koa";
 import Router from "koa-router";
 import { AddBookRequest } from "../request/AddBookRequest";
+import { DeleteBookRequest } from "../request/DeleteBookRequest";
 import * as storage from "../storage/redis";
 
 const router = new Router();
@@ -55,6 +56,40 @@ router.post(`/books`, async (ctx: Context) => {
     }
   } catch (e) {
     console.error(e);
+  }
+});
+
+
+router.delete(`/books`, async (ctx: Context) => {
+  try {
+    const validatorOptions = {};
+
+    const book = new DeleteBookRequest();
+    book.title = ctx.request.body.title || '';
+
+    const errors = await validate(book, validatorOptions);
+
+    if (errors.length > 0) {
+      ctx.status = 400;
+      ctx.body = {
+        status: 'error',
+        data: errors
+      }
+
+      return ctx;
+    }
+
+    const list = 'book_list';
+    const store = storage.redisStorage();
+
+    store.remove(list, book.title);
+
+    ctx.status = 200;
+    ctx.body = {
+      books: await store.get(list)
+    };
+  } catch (err) {
+    console.log(err);
   }
 });
 

@@ -11,6 +11,8 @@ afterEach((done) => {
 
 describe("routes/books", () => {
 
+  describe('post', () => {
+
   const books = [
     "아몬드",
     "모모",
@@ -150,5 +152,93 @@ describe("routes/books", () => {
         ]
       }
     );
+  });
+
+
+  });
+
+  describe('delete', () => {
+    it('returns an empty list when the list is empty', async () => {
+
+      const book = "Almond";
+    
+      const list_of_books: string[] = [ book ];
+
+      const mockGet = jest.fn((list: string) => Promise.resolve(list_of_books));
+      const mockAdd = jest.fn();
+      const mockRemove = jest.fn((list: string, title: string) => {
+        const index = list_of_books.indexOf(book);
+        if (index === -1) {
+          return false;
+        }
+        list_of_books.splice(index, 1);
+        return true;
+      });
+
+      storage.redisStorage = jest.fn(() => {
+        return {
+          get: mockGet,
+          add: mockAdd,
+          remove: mockRemove,
+        }
+      });
+
+      const response = await request(server)
+        .delete("/books")
+        .send({ title: book });
+
+      expect(response.status).toEqual(200);
+      expect(response.type).toEqual("application/json");
+      expect(response.body).toEqual({
+        books: []
+      });
+
+      expect(mockGet).toHaveBeenCalled();
+      expect(mockRemove).toHaveBeenCalled();
+      expect(mockAdd).not.toHaveBeenCalled();
+    });
+  
+    it('returns an updated list when deleting a book', async () => {
+      const book = "Almond";
+
+      const list_of_books: string[] = [
+        "Momo",
+        book,
+        "The Giver"
+      ];
+
+      const mockGet = jest.fn((list:string) => Promise.resolve(list_of_books));
+      const mockAdd = jest.fn();
+      const mockRemove = jest.fn((list:string, title:string) => {
+        const index = list_of_books.indexOf(book);
+        if (index === -1) {
+          return false;
+        }
+        list_of_books.splice(index, 1);
+        return true;
+      });
+
+      storage.redisStorage = jest.fn(() => {
+        return {
+          get: mockGet,
+          add: mockAdd,
+          remove: mockRemove,
+        }
+      });
+
+      const response = await request(server)
+        .delete(`/books`)
+        .send({ title: book });
+      
+      expect(response.status).toEqual(200);
+      expect(response.type).toEqual("application/json");
+      expect(response.body).toEqual({
+        books: list_of_books.filter(i => i !== book)
+      })
+
+      expect(mockGet).toHaveBeenCalled();
+      expect(mockRemove).toHaveBeenCalled();
+      expect(mockAdd).not.toHaveBeenCalled();
+    });
   });
 });

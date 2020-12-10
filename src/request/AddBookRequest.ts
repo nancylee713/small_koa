@@ -1,8 +1,3 @@
-import { IsString, Length } from "class-validator";
+import { BookRequest } from "./BookRequest";
 
-export class AddBookRequest {
-
-  @IsString()
-  @Length(1, 20)
-  title!: string;
-}
+export class AddBookRequest extends BookRequest {}
